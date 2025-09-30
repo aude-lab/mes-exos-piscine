@@ -37,5 +37,5 @@ if [ "$NUMBER" -lt 1 ]; then
 fi
 for i in $(seq 1 "$NUMBER"); do
 	filename="${FILENAME}-${i}.${EXTENSION}"
-	touch "$filename"
+	touch -- "$filename"
 done 
