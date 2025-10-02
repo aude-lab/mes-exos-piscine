@@ -6,7 +6,8 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ ! -f "$1" ]; then
-    printf "\t$1:\n\t    is not a valid file\n"
+    echo "$1:"
+    echo "	is not a valid file"
     exit 2
 fi
 
