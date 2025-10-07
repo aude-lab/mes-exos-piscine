@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <unistd.h>
 int create_file_755(const char *path)
 {
     int fd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0755);
