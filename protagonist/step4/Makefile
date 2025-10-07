@@ -1,8 +1,6 @@
-all: clean_binary
-
-clean_binary: clean.o
-	$(CC) -o clean clean.o
+all: clean
+	gcc -o clean clean.c
 clean:
-	rm -rf clean.o clean
+	rm -rf clean clean.o
 
-.PHONY: all clean 
+.PHONY: clean  

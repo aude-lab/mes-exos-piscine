@@ -1,14 +1,14 @@
 CC=gcc
 CFLAGS= -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
-LDFLAGS=
 
 main: main.o
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 debug: CFLAGS += -fsanitize=address -g
-debug: LDFLAGS += -fsanitize=address -g
-debug: main
+debug: LDFLAGS += -fsanitize=address 
+debug: main.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
-	rm -rf main.o main
-.PHONY: debug clean
+	$(RM) main.o debug main
+.PHONY: clean
