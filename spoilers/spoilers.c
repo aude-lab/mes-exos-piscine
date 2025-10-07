@@ -7,24 +7,24 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-int main(int argcn char *argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        printf(stderr, "Invalid number of arguments\n");
+        fprintf(stderr, "Invalid number of arguments\n");
         return 1;
     }
 
     int fd = open(argv[1], O_RDONLY);
     if (fd == -1)
     {
-        printf(stderr, "Could not open file\n");
+        fprintf(stderr, "Could not open file\n");
         return 1;
     }
     off_t sizef = lseek(fd, 0, SEEK_END);
     if (sizef == -1)
     {
-        printf(stderr, "error\n");
+        fprintf(stderr, "error\n");
         close(fd);
         return 1;
     }
@@ -36,21 +36,21 @@ int main(int argcn char *argv[])
     {
         if (lseek(fd, pos, SEEK_SET) == -1)
         {
-            printf(stderr, "error\n");
+            fprintf(stderr, "error\n");
             close(fd);
             return 1;
         }
         char c;
         if (read(fd, &c, 1) != 1)
         {
-            printf(stderr, "error\n");
+            fprintf(stderr, "error\n");
             close(fd);
             return 1;
         }
         if (!isspace(c))
         {
             result[1 - f] = c;
-            found++;
+            f++;
         }
 
         pos--;
@@ -59,7 +59,7 @@ int main(int argcn char *argv[])
     if (f < 2)
 
     {
-        printf(stderr, "File is not long enough\n");
+        fprintf(stderr, "File is not long enough\n");
         close(fd);
         return 1;
     }
