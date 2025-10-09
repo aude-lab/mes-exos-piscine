@@ -1,7 +1,18 @@
 #!/bin/sh
 
 while IFS= read -r line; do
-    trimmed=$(echo "$line" | tr -d ' \t')
+    trimmed=$(echo "$line")
+
+
+    if [ -z "$line" ]; then
+        echo "it is empty"
+        continue
+    fi
+
+    if echo "$line" | grep -q '^[ \t]*$'; then
+        echo "it is empty"
+        continue
+    fi
     
     if [ -z "$trimmed" ]; then
         echo "it is empty"
