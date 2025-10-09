@@ -7,6 +7,10 @@ fi
 filename="$1"
 line_num="$2"
 
+case "$line_num" in
+    ''|*[!0-9]*) exit 1 ;;
+esac
+
 if [ ! -f "$filename" ] || [ "$line_num" -le 0 ]; then
     exit 1
 fi
@@ -16,4 +20,7 @@ if [ "$line_num" -gt "$total_lines" ]; then
     exit 1
 fi
 
-head -n "$line_num" "$filename" | tail -n 1 | cut -d';' -f2,3 | sed 's/;/ is /'
+line=$(head -n "$line_num" "$filename" | tail -n 1)
+column2=$(echo "$line" | cut -d';' -f2)
+column3=$(echo "$line" | cut -d';' -f3)
+echo "$column2 is $column3"

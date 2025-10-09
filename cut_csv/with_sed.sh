@@ -6,6 +6,11 @@ fi
 
 filename="$1"
 line_num="$2"
+
+case "$line_num" in
+    ''|*[!0-9]*) exit 1 ;;
+esac
+
 if [ ! -f "$filename" ] || [ "$line_num" -le 0 ]; then
     exit 1
 fi
