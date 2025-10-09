@@ -1,26 +1,30 @@
 #include "insertion_sort.h"
+#include <stdio.h>
+#include <stddef.h>
+
+typedef int (*f_cmp)(const void *, const void *);
 
 void insertion_sort(void **array, f_cmp comp)
 {
     if (!array || !comp)
         return;
 
-    int size = 0;
-    while (array[size] != NULL)
+    size_t size = 0;
+    while (array[size])
     {
         size++;
     }
 
-    for (int i = 1; i < size; i++)
+    for (size_t i = 1; i < size; i++)
     {
         void *key = array[i];
-        int j = i - 1;
+        size_t j = i;
 
-        while (j >= 0 && comp(array[j], key) > 0)
+        while (j > 0 && comp(array[j - 1], key) > 0)
         {
-            array[j + 1] = array[j];
-            j = j - 1;
+            array[j] = array[j - 1];
+            j--;
         }
-        array[j + 1] = key;
+        array[j] = key;
     }
 }
