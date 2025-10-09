@@ -7,8 +7,14 @@ fi
 filename="$1"
 line_num="$2"
 
+if [ ! -f "$filename" ] || [ ! -r "$filename" ]; then
+    exit 1
+fi
+
 case "$line_num" in
-    ''|*[!0-9]*) exit 1 ;;
+	''|*[!0-9]*) 
+	    exit 1 
+	    ;;
 esac
 
 if [ ! -f "$filename" ] || [ "$line_num" -le 0 ]; then

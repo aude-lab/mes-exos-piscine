@@ -7,20 +7,30 @@ fi
 filename="$1"
 line_num="$2"
 
-case "$line_num" in
-    ''|*[!0-9]*) exit 1 ;;
+if [ ! -f "$filename" ]; then
+    exit 1
+fi
+
+if [ ! -r "$filename" ]; then
+    exit 1
+fi
+
+case "$line_num" in 
+	''|*[!0-9]*)
+		exit 1
+		;;
 esac
 
-if [ ! -f "$filename" ] || [ "$line_num" -le 0 ]; then
-    exit 1
-fi
 
 total_lines=$(wc -l < "$filename")
-if [ "$line_num" -gt "$total_lines" ]; then
+
+if [ ! -f "$filename" ] || [ "$line_num" -le 0 ] || [ "$line_num" -gt "$total_lines" ]; then
     exit 1
 fi
 
+
 line=$(head -n "$line_num" "$filename" | tail -n 1)
+
 column2=$(echo "$line" | cut -d';' -f2)
 column3=$(echo "$line" | cut -d';' -f3)
 echo "$column2 is $column3"
