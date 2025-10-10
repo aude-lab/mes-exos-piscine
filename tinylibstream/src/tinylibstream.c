@@ -79,38 +79,44 @@ struct stream *lbs_fopen(const char *path, const char *mode)
 
 int lbs_fflush(struct stream *stream)
 {
-	if (!stream)
-    {
-        return 0;
-    }
+	 if (!stream)
+        return -1;
 
-    if (stream->io_operation == STREAM_WRITING)
+    if (stream->error)
+        return -1;
+
+    if (stream->io_operation == STREAM_WRITING && stream->buffered_size > 0)
     {
-        if (stream->buffered_size > 0)
+        size_t total_written = 0;
+        while (total_written < stream->buffered_size)
         {
-            ssize_t bytes_written = write(stream->fd, stream->buffer, stream->buffered_size);
-
-            if (bytes_written < 0)
+            ssize_t written = write(stream->fd,
+                                   stream->buffer + total_written,
+                                   stream->buffered_size - total_written);
+            if (written == -1)
             {
                 stream->error = 1;
                 return -1;
             }
-
-            stream->buffered_size = 0;
+            total_written += written;
         }
+        stream->buffered_size = 0;
     }
-    else if (stream->io_operation == STREAM_READING)
-    {
-        size_t unread_sz = stream->buffered_size - stream->already_read;
 
-        if (unread_sz > 0)  
+    if (stream->io_operation == STREAM_READING && stream->already_read > 0)
+    {
+        size_t unread_bytes = stream->buffered_size - stream->already_read;
+
+        if (unread_bytes > 0)
         {
-            if (lseek(stream->fd, -unread_sz, SEEK_CUR) == -1)
+            if (lseek(stream->fd, -unread_bytes, SEEK_CUR) == -1)
             {
                 stream->error = 1;
                 return -1;
             }
         }
+
+
 
         stream->already_read = 0;
         stream->buffered_size = 0;
