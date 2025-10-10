@@ -1,30 +1,24 @@
 #!/bin/sh
 
-while IFS= read -r line; do
-    trimmed=$(echo "$line")
-
-
-    if [ -z "$line" ]; then
+while read -r line; do
+	if [ -z "$line" ] || echo "$line" | grep -q '^[[:space:]]*$'; then
         echo "it is empty"
         continue
     fi
 
-    if echo "$line" | grep -q '^[ \t]*$'; then
-        echo "it is empty"
-        continue
+    if echo "$line" | grep -q '[^a-zA-Z0-9]'; then
+        echo "it is too complicated"
+        exit 0
     fi
-    
-    if [ -z "$trimmed" ]; then
-        echo "it is empty"
-        continue
-    fi
-    if echo "$trimmed" | grep -q '^[a-zA-Z]*$'; then
+
+
+    if echo "$line" | grep -q '^[a-zA-Z]*$'; then
         echo "it is a word"
-    elif echo "$trimmed" | grep -q '^[0-9]$'; then
+    elif echo "$line" | grep -q '^[0-9]$'; then
         echo "it is a digit"
-    elif echo "$trimmed" | grep -q '^[0-9][0-9]*$'; then
+    elif echo "$line" | grep -q '^[0-9][0-9]*$'; then
         echo "it is a number"
-    elif echo "$trimmed" | grep -q '^[a-zA-Z0-9]*$'; then
+    elif echo "$line" | grep -q '^[a-zA-Z0-9]*$'; then
         echo "it is an alphanum"
     else
         echo "it is too complicated"
