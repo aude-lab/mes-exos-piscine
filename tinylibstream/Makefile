@@ -19,14 +19,15 @@ $(TARGET): $(OBJS)
 	ar rcs $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET) test_runner
 
-check: library
-	$(CC) $(CFLAGS) -L. tests/tests.c tests/helpers.c -o test_runner -lcriterion -lstream
+
+check: $(TARGET)
+	$(CC) $(CFLAGS) -Iinclude -o test_runner tests/tests.c tests/helpers.c $(TARGET) -lcriterion -fsanitize=address
 	./test_runner
