@@ -17,72 +17,50 @@ int main(void)
         fflush(stdout);
 
         if (!fgets(new_buffer, sizeof(new_buffer), stdin))
-        {
             break;
-        }
 
         size_t mylen = strlen(new_buffer);
         if (mylen > 0 && new_buffer[mylen - 1] == '\n')
         {
-            new_buffer[mylen - 1] = '\0';
-            mylen--;
+            new_buffer[--mylen] = '\0';
         }
 
         if (mylen == 0)
-        {
             continue;
-        }
 
         if (mylen > 0 && new_buffer[mylen - 1] == '$')
             new_buffer[--mylen] = '\0';
+	if (mylen == 0) continue;
 
         char *command = strtok(new_buffer, " ");
-        char *arg = strtok(NULL, "");
+        char *arg = strtok(NULL, "\n");
         if (arg && strlen(arg) == 0)
-        {
             arg = NULL;
-        }
-        /*if (command && strlen(command) > 0
-            && command[strlen(command) - 1] == '$')
-        {
-            command[strlen(command) - 1] = '\0';
-        }
-        if (arg && strlen(arg) > 0 && arg[strlen(arg) - 1] == '$')
-        {
-            arg[strlen(arg) - 1] = '\0';
-        }*/
+
         int founded = 0;
+
         for (size_t i = 0; i < get_commands_count(); i++)
         {
-            if (strcmp(command, commands[i].command_name) == 0)
+            if (strcmp(command, commands[i].command_name))
+                continue;
+
+            founded = 1;
+            if ((!strcmp(command, "print") || !strcmp(command, "cat")) && !arg)
             {
-                founded = 1;
-                if ((strcmp(command, "print") == 0
-                     || strcmp(command, "cat") == 0)
-                    && !arg)
-                {
-                    fprintf(stderr,
-                            "fctptr_cmd: %s can take only one argument\n",
-                            command);
-                }
-                else if (strcmp(command, "exit") == 0 && arg)
-                {
-                    fprintf(stderr, "fctptr_cmd: %s takes no argument\n",
-                            command);
-                }
-                else
-                {
-                    commands[i].handle(arg);
-                }
-                break;
+                fprintf(stderr, "fctptr_cmd: %s can take only one argument\n",
+                        command);
             }
+            else if (!strcmp(command, "exit") && arg)
+            {
+                fprintf(stderr, "fctptr_cmd: %s takes no argument\n", command);
+            }
+            else
+                commands[i].handle(arg);
+            break;
         }
 
         if (!founded)
-        {
             fprintf(stderr, "fctptr_cmd: unknown command\n");
-        }
     }
-
     return 0;
 }
