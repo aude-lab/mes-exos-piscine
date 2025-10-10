@@ -101,14 +101,19 @@ int lbs_fflush(struct stream *stream)
     }
 
     if (stream->io_operation == STREAM_READING
-        && stream->already_read < stream->buffered_size)
+        /*&& stream->already_read < stream->buffered_size*/)
     {
-        size_t unread = stream->buffered_size - stream->already_read;
+        size_t unread_sz = stream->buffered_size - stream->already_read;
+        if (unread_sz > 0)
 
-        if (lseek(stream->fd, -(off_t)unread, SEEK_CUR) == -1)
         {
-            stream->error = 1;
-            return -1;
+            off_t unread = unread_sz;
+
+            if (lseek(stream->fd, -unread, SEEK_CUR) == -1)
+            {
+                stream->error = 1;
+                return -1;
+            }
         }
 
         memset(stream->buffer, 0, LBS_BUFFER_SIZE);
@@ -164,6 +169,20 @@ static int switchingtoreading(struct stream *stream)
     return 0;
 }
 
+static int should_flush_now(struct stream *stream, int c)
+{
+    if (stream->buffered_size == LBS_BUFFER_SIZE)
+        return 1;
+    if (stream->buffering_mode == STREAM_LINE_BUFFERED && c == '\n')
+        return 1;
+    return 0;
+}
+
+
+
+
+
+
 int lbs_fputc(int c, struct stream *stream)
 {
     if (!stream || !stream_writable(stream))
@@ -179,7 +198,8 @@ int lbs_fputc(int c, struct stream *stream)
         return -1;
     }
 
-    if (stream->buffering_mode == STREAM_UNBUFFERED)
+
+   if (stream->buffering_mode == STREAM_UNBUFFERED)
     {
         char ch = c;
         ssize_t written = write(stream->fd, &ch, 1);
@@ -191,27 +211,10 @@ int lbs_fputc(int c, struct stream *stream)
         return c;
     }
 
-    int should_flush = 0;
-
-    if (stream->buffered_size == LBS_BUFFER_SIZE)
-        should_flush = 1;
-
-    else if (stream->buffering_mode == STREAM_LINE_BUFFERED)
-    {
-        if (stream->buffered_size >= LBS_BUFFER_SIZE - 1 || c == '\n')
-            should_flush = 1;
-    }
-    if (should_flush && lbs_fflush(stream) == -1)
-    {
-        stream->error = 1;
-        return -1;
-    }
 
     stream->buffer[stream->buffered_size++] = c;
 
-    if ((stream->buffering_mode == STREAM_UNBUFFERED)
-        || (stream->buffering_mode == STREAM_LINE_BUFFERED && c == '\n')
-        || (stream->buffered_size == LBS_BUFFER_SIZE))
+    if (should_flush_now(stream, c))
     {
         if (lbs_fflush(stream) == -1)
         {
@@ -222,6 +225,7 @@ int lbs_fputc(int c, struct stream *stream)
 
     return c;
 }
+
 
 static int refill_buffer(struct stream *stream)
 {
@@ -255,6 +259,7 @@ int lbs_fgetc(struct stream *stream)
         stream->error = 1;
         return -1;
     }
+
 
     if (stream->buffered_size == 0
         || stream->already_read >= stream->buffered_size)
