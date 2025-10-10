@@ -2,7 +2,6 @@
 #define COMMANDS_H
 
 #include <stddef.h>
-
 typedef int (*handler)(const char *arg1);
 
 struct cmd
@@ -17,6 +16,6 @@ int cmd_print(const char *arg);
 int cmd_exit(const char *arg);
 int cmd_cat(const char *arg);
 extern const struct cmd commands[];
-extern const size_t commands_count;
+size_t get_commands_count(void);
 
 #endif /* COMMANDS_H */
