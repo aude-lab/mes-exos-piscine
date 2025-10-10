@@ -12,8 +12,8 @@ int cmd_help(const char *arg)
 {
     if (arg)
     {
-	    fprintf(stderr, "fctptr_cmd: help takes no argument\n");
-            return 1;
+        fprintf(stderr, "fctptr_cmd: help takes no argument\n");
+        return 1;
     };
     printf("The available commands are:\n");
     printf("help\n");
@@ -28,7 +28,7 @@ int cmd_hello(const char *arg)
 {
     if (arg)
     {
-	fprintf(stderr, "fctptr_cmd: hello takes no argument\n");
+        fprintf(stderr, "fctptr_cmd: hello takes no argument\n");
         return 1;
     };
     printf("hello\n");
@@ -37,6 +37,11 @@ int cmd_hello(const char *arg)
 
 int cmd_print(const char *arg)
 {
+    if (strchr(arg, ' ') != NULL)
+    {
+        fprintf(stderr, "fctptr_cmd: print can take only one argument\n");
+        return 1;
+    }
     if (!arg)
     {
         fprintf(stderr, "fctptr_cmd: print needs one argument\n");
@@ -50,7 +55,7 @@ int cmd_exit(const char *arg)
 {
     if (arg)
     {
-	fprintf(stderr, "fctptr_cmd: exit takes no argument\n");
+        fprintf(stderr, "fctptr_cmd: exit takes no argument\n");
         return 1;
     };
     exit(0);
@@ -64,8 +69,11 @@ int cmd_cat(const char *arg)
         return 1;
     }
 
-
-    free(temp_arg);
+    if (strchr(arg, ' ') != NULL)
+    {
+        fprintf(stderr, "fctptr_cmd: cat can take only one argument\n");
+        return 1;
+    }
 
     int fd = open(arg, O_RDONLY);
     if (fd == -1)
