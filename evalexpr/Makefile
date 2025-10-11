@@ -1,27 +1,24 @@
 CC = gcc
-CFLAGS = -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
+CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99 -Wvla
+
 SRC_DIR = src
-OBJ_DIR = obj
-SRC = $(wildcard $(SRC_DIR)/*.c)
-OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-TARGET = evalexpr
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(SRCS:.c=.o)
 
-all: $(TARGET)
+BIN = evalexpr
 
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
+all: $(BIN)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(BIN): $(OBJS)
+	$(CC) $^ -o $@
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+%.o: %.c
+	$(CC) $(CFLAGS)  -c $< -o $@
 
-check: $(TARGET)
-	@echo "Running tests..."
-	@./tests/simple_test.sh
+check: $(BIN)
+	./tests/simple_test.sh
 
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	$(RM) $(BIN) $(OBJS)
 
-.PHONY: all check cledn
+.PHONY: all check clean
