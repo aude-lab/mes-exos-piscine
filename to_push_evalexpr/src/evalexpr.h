@@ -39,7 +39,7 @@ int is_a_operator(char c);
 int get_operator_priority(char op);
 int switch_operator_case(int a, int b, char op);
 char *oneshunting_yard(const char *infix);
-int eval_infix(const char *expression);
+int evalex_infix(const char *expression);
 int is_unary_operator(char op, const char *prev_token_end);
 
 #endif /* !EVALEXPR_H */

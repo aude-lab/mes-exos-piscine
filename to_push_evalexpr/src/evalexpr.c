@@ -9,7 +9,7 @@
 
 int is_a_operator(char c)
 {
-    return c == '-' || c == '+' || c == '*' || c == '/';
+    return c == '-' || c == '+' || c == '*' || c == '/' || c == '%' || c == '^';
 }
 static void skipe_space(const char **expr)
 {
@@ -29,8 +29,27 @@ int switch_operator_case(int a, int b, char operat)
         return a * b;
     case '/':
         if (b == 0)
-            return 0;
+            return 3;
         return a / b;
+    case '%':
+        if (b == 0)
+            return 3;
+        return a % b;
+
+    case '^':
+        if (b < 0)
+            return 0;
+        int result = 1;
+        for (int i = 0; i < b; i++)
+            result *= a;
+        return result;
+
+    case 'u':
+        return b;
+
+    case 'm':
+        return -b;
+
     default:
         return 0;
     }
@@ -67,20 +86,18 @@ struct Token get_next_token(const char **expr)
         return the_token;
     }
 
-    if (**expr == '(')  
+    if (**expr == '(')
     {
         the_token.type = TOKEN_PAREN_LEFT;
         (*expr)++;
         return the_token;
     }
-    if (**expr == ')') 
+    if (**expr == ')')
     {
         the_token.type = TOKEN_PAREN_RIGHT;
         (*expr)++;
         return the_token;
     }
-
-
 
     the_token.type = TOKEN_END;
     return the_token;
@@ -114,12 +131,13 @@ int eval_rpn(const char *expression)
             int result = switch_operator_case(a, b, the_token.op);
             stack_push(stack, result);
         }
-        else if (the_token.type == TOKEN_PAREN_LEFT || the_token.type == TOKEN_PAREN_RIGHT)
+        else if (the_token.type == TOKEN_PAREN_LEFT
+                 || the_token.type == TOKEN_PAREN_RIGHT)
         {
             stack_free(stack);
             return 0;
         }
-        
+
         the_token = get_next_token(&ptr);
     }
 
@@ -171,7 +189,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        result = eval_infix(buffer);
+        result = evalex_infix(buffer);
     }
 
     printf("%d\n", result);

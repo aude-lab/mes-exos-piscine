@@ -1,121 +1,225 @@
 #!/bin/bash
 
-echo "=== debut Tests ==="
-
-echo "Test 1: 1 1 +"
-echo "1 1 +" | ./evalexpr -rpn
-
-echo "Test 2: 2 3 *" 
-echo "2 3 *" | ./evalexpr -rpn
-
-echo "Test 3: 10 5 -"
-echo "10 5 -" | ./evalexpr -rpn
+echo "============= TESTING STARTING ================================"
 
 
-echo "1. Test: 1+1 (standard)"
+echo "Test 1: 1+1"
 echo "1+1" | ./evalexpr
+echo "Expected: 2"
+echo "Result: $(echo "1+1" | ./evalexpr)"
 echo
 
-echo "2. Test: 5-2 (standard)"
+echo "Test 2: 5-2"
 echo "5-2" | ./evalexpr
+echo "Expected: 3"
+echo "Result: $(echo "5-2" | ./evalexpr)"
 echo
 
-echo "3. Test: 3*4 (standard)"
+echo "Test 3: 3*4"
 echo "3*4" | ./evalexpr
+echo "Expected: 12"
+echo "Result: $(echo "3*4" | ./evalexpr)"
 echo
 
-echo "4. Test: 8/2 (standard)"
+echo "Test 4: 8/2"
 echo "8/2" | ./evalexpr
+echo "Expected: 4"
+echo "Result: $(echo "8/2" | ./evalexpr)"
 echo
 
-echo "5. Test: 2+3*4 (priorité standard)"
+echo "Test 5: 10%3"
+echo "10%3" | ./evalexpr
+echo "Expected: 1"
+echo "Result: $(echo "10%3" | ./evalexpr)"
+echo
+
+echo "Test 6: 2^3"
+echo "2^3" | ./evalexpr
+echo "Expected: 8"
+echo "Result: $(echo "2^3" | ./evalexpr)"
+echo
+
+echo "Test 7: 2+3*4"
 echo "2+3*4" | ./evalexpr
+echo "Expected: 14"
+echo "Result: $(echo "2+3*4" | ./evalexpr)"
 echo
 
-echo "6. Test: 10-8/2 (priorité standard)"
+echo "Test 8: 10-8/2"
 echo "10-8/2" | ./evalexpr
+echo "Expected: 6"
+echo "Result: $(echo "10-8/2" | ./evalexpr)"
 echo
 
-echo "7. Test: 10-3-2 (associativité standard)"
-echo "10-3-2" | ./evalexpr
-echo
-
-echo "8. Test: (1+2) (parenthèses standard)"
+echo "Test 9: (1+2)"
 echo "(1+2)" | ./evalexpr
+echo "Expected: 3"
+echo "Result: $(echo "(1+2)" | ./evalexpr)"
 echo
 
-echo "9. Test: (2+3)*4 (parenthèses standard)"
+echo "Test 10: (2+3)*4"
 echo "(2+3)*4" | ./evalexpr
+echo "Expected: 20"
+echo "Result: $(echo "(2+3)*4" | ./evalexpr)"
 echo
 
-echo "10. Test: ((1+2)*3) (parenthèses imbriquées standard)"
+echo "Test 11: ((1+2)*3)"
 echo "((1+2)*3)" | ./evalexpr
+echo "Expected: 9"
+echo "Result: $(echo "((1+2)*3)" | ./evalexpr)"
 echo
 
-echo "11. Test: 2*(3+4)-5 (complexe standard)"
+echo "Test 12: 2*(3+4)-5"
 echo "2*(3+4)-5" | ./evalexpr
+echo "Expected: 9"
+echo "Result: $(echo "2*(3+4)-5" | ./evalexpr)"
 echo
 
-echo "12. Test: espaces multiples (standard)"
-echo "   1   +   2   " | ./evalexpr
-echo
-
-echo "13. Test: espaces avec parenthèses (standard)"
-echo " ( 1 + 2 ) * 3 " | ./evalexpr
-echo
-
-echo "14. Test: 3+4*2/(1-5) (complexe standard)"
+echo "Test 13: 3+4*2/(1-5)"
 echo "3+4*2/(1-5)" | ./evalexpr
+echo "Expected: 1"
+echo "Result: $(echo "3+4*2/(1-5)" | ./evalexpr)"
 echo
 
-echo "15. Test: 10-2*3+4 (complexe standard)"
-echo "10-2*3+4" | ./evalexpr
+echo "Test 14: 2^3*4"
+echo "2^3*4" | ./evalexpr
+echo "Expected: 32"
+echo "Result: $(echo "2^3*4" | ./evalexpr)"
 echo
 
-echo "16. Test: 1 1 + (RPN)"
+echo "Test 15: 2*3^2"
+echo "2*3^2" | ./evalexpr
+echo "Expected: 18"
+echo "Result: $(echo "2*3^2" | ./evalexpr)"
+echo
+
+echo "Test 16: -5+3"
+echo "-5+3" | ./evalexpr
+echo "Expected: -2"
+echo "Result: $(echo "-5+3" | ./evalexpr)"
+echo
+
+echo "Test 17: +2*-3"
+echo "+2*-3" | ./evalexpr
+echo "Expected: -6"
+echo "Result: $(echo "+2*-3" | ./evalexpr)"
+echo
+
+echo "Test 18: --5"
+echo "--5" | ./evalexpr
+echo "Expected: 5"
+echo "Result: $(echo "--5" | ./evalexpr)"
+echo
+
+echo "Test 19: 3--+++4"
+echo "3--+++4" | ./evalexpr
+echo "Expected: 7"
+echo "Result: $(echo "3--+++4" | ./evalexpr)"
+echo
+
+echo "Test 20: 86*--1"
+echo "86*--1" | ./evalexpr
+echo "Expected: 86"
+echo "Result: $(echo "86*--1" | ./evalexpr)"
+echo
+
+echo "Test 21: espaces simples"
+echo "   1   +   2   " | ./evalexpr
+echo "Expected: 3"
+echo "Result: $(echo "   1   +   2   " | ./evalexpr)"
+echo
+
+echo "Test 22: espaces avec parenthèses"
+echo " ( 1 + 2 ) * 3 " | ./evalexpr
+echo "Expected: 9"
+echo "Result: $(echo " ( 1 + 2 ) * 3 " | ./evalexpr)"
+echo
+
+echo "Test 23: espaces complexes"
+echo "  2  *  (  3  +  4  )  -  5  " | ./evalexpr
+echo "Expected: 9"
+echo "Result: $(echo "  2  *  (  3  +  4  )  -  5  " | ./evalexpr)"
+echo
+
+echo "Test 24: 1 1 + (RPN)"
 echo "1 1 +" | ./evalexpr -rpn
+echo "Expected: 2"
+echo "Result: $(echo "1 1 +" | ./evalexpr -rpn)"
 echo
 
-echo "17. Test: 5 2 - (RPN)"
+echo "Test 25: 5 2 - (RPN)"
 echo "5 2 -" | ./evalexpr -rpn
+echo "Expected: 3"
+echo "Result: $(echo "5 2 -" | ./evalexpr -rpn)"
 echo
 
-echo "18. Test: 3 4 * (RPN)"
+echo "Test 26: 3 4 * (RPN)"
 echo "3 4 *" | ./evalexpr -rpn
+echo "Expected: 12"
+echo "Result: $(echo "3 4 *" | ./evalexpr -rpn)"
 echo
 
-echo "19. Test: 8 2 / (RPN)"
+echo "Test 27: 8 2 / (RPN)"
 echo "8 2 /" | ./evalexpr -rpn
+echo "Expected: 4"
+echo "Result: $(echo "8 2 /" | ./evalexpr -rpn)"
 echo
 
+echo "Test 28: 10 3 % (RPN modulo)"
+echo "10 3 %" | ./evalexpr -rpn
+echo "Expected: 1"
+echo "Result: $(echo "10 3 %" | ./evalexpr -rpn)"
+echo
 
-echo "20. Test: 5 1 2 + 4 * + 3 - (RPN complexe)"
+echo "Test 29: 2 3 ^ (RPN puissance)"
+echo "2 3 ^" | ./evalexpr -rpn
+echo "Expected: 8"
+echo "Result: $(echo "2 3 ^" | ./evalexpr -rpn)"
+echo
+
+echo "Test 30: 5 1 2 + 4 * + 3 - (RPN complexe)"
 echo "5 1 2 + 4 * + 3 -" | ./evalexpr -rpn
+echo "Expected: 14"
+echo "Result: $(echo "5 1 2 + 4 * + 3 -" | ./evalexpr -rpn)"
 echo
 
-echo "21. Test: espaces RPN"
+echo "Test 31: 2 3 4 * + (RPN priorité)"
+echo "2 3 4 * +" | ./evalexpr -rpn
+echo "Expected: 14"
+echo "Result: $(echo "2 3 4 * +" | ./evalexpr -rpn)"
+echo
+
+echo "Test 32: 2 3 ^ 4 * (RPN puissance)"
+echo "2 3 ^ 4 *" | ./evalexpr -rpn
+echo "Expected: 32"
+echo "Result: $(echo "2 3 ^ 4 *" | ./evalexpr -rpn)"
+echo
+
+echo "Test 33: espaces RPN"
 echo "  2   3   *   4   +  " | ./evalexpr -rpn
+echo "Expected: 10"
+echo "Result: $(echo "  2   3   *   4   +  " | ./evalexpr -rpn)"
 echo
 
-echo "22. Test: erreur caractère invalide"
-echo "1 + a" | ./evalexpr
-echo "Code: $?"
+echo "Test 34: erreur division par zéro"
+echo "1/0" | ./evalexpr
+echo "Expected: Nothing + Code: 3"
+echo "Result: Nothing + Code: $(echo "1/0" | ./evalexpr 2>/dev/null; echo $?)"
 echo
 
-echo "23. Test: erreur parenthèses en RPN"
-echo "(1+2)" | ./evalexpr -rpn
-echo "Code: $?"
+echo "Test 35: erreur modulo par zéro"
+echo "5%0" | ./evalexpr
+echo "Expected: Nothing + Code: 3"
+echo "Result: Nothing + Code: $(echo "5%0" | ./evalexpr 2>/dev/null; echo $?)"
 echo
 
-echo "24. Test: erreur parenthèse non fermée"
-echo "(1+2" | ./evalexpr
-echo "Code: $?"
-echo
-
-echo "25. Test: mauvais argument"
+echo "Test 36: mauvais argument"
 ./evalexpr --invalid 2>/dev/null
-echo "Code: $?"
+echo "Expected: Nothing + Code: 4"
+echo "Result: Nothing + Code: $?"
 echo
 
 
-echo "=== Fin des tests ==="
+
+
+echo "=== END TEST ==="

@@ -11,18 +11,23 @@ int get_operator_priority(char op)
     case '^':
         return 4;
     case '*':
-	return 3;
+        return 3;
     case '/':
-	return 3;
+        return 3;
     case '%':
         return 3;
     case '+':
-	return 2;
+        return 2;
     case '-':
         return 2;
     default:
         return 0;
     }
+}
+
+int is_right_associative(char op)
+{
+    return op == '^';
 }
 
 int is_unary_operator(char op, const char *prev_token_end)
@@ -38,7 +43,14 @@ int is_unary_operator(char op, const char *prev_token_end)
 char *oneshunting_yard(const char *infix)
 {
     struct stack *op_stack = stack_create();
+    if (!op_stack)
+        return NULL;
     char *output = malloc(1024 * sizeof(char));
+    if (!output)
+    {
+        stack_free(op_stack);
+        return NULL;
+    }
     output[0] = '\0';
     size_t output_len = 0;
 
@@ -61,7 +73,7 @@ char *oneshunting_yard(const char *infix)
         else if (token.type == TOKEN_OPERATOR)
         {
             int unary = is_unary_operator(token.op, prev_token_end);
-            char current_op = token.op;
+            int current_op = token.op;
 
             if (unary)
             {
@@ -70,7 +82,7 @@ char *oneshunting_yard(const char *infix)
 
             while (!stack_is_empty(op_stack))
             {
-                char top_op = (char)stack_peek(op_stack);
+                int top_op = stack_peek(op_stack);
 
                 if (top_op == '(')
                     break;
@@ -78,10 +90,12 @@ char *oneshunting_yard(const char *infix)
                 int top_prec = get_operator_priority(top_op);
                 int curr_prec = get_operator_priority(current_op);
 
-                if ((current_op != '^' && curr_prec <= top_prec)
-                    || (current_op == '^' && curr_prec < top_prec))
+                if ((!is_right_associative(current_op) && curr_prec <= top_prec)
+                    || (is_right_associative(current_op)
+                        && curr_prec < top_prec))
                 {
-                    char op_str[4] = { (char)stack_pop(op_stack), ' ', '\0' };
+                    char op_char = stack_pop(op_stack);
+                    char op_str[4] = { op_char, ' ', '\0' };
                     strcat(output, op_str);
                     output_len += 2;
                 }
@@ -103,7 +117,7 @@ char *oneshunting_yard(const char *infix)
         {
             while (!stack_is_empty(op_stack))
             {
-                char op = (char)stack_pop(op_stack);
+                int op = stack_pop(op_stack);
                 if (op == '(')
                     break;
 
@@ -117,7 +131,7 @@ char *oneshunting_yard(const char *infix)
 
     while (!stack_is_empty(op_stack))
     {
-        char op = (char)stack_pop(op_stack);
+        int op = stack_pop(op_stack);
         if (op == '(')
         {
             free(output);
@@ -139,7 +153,7 @@ char *oneshunting_yard(const char *infix)
     return output;
 }
 
-int eval_infix(const char *expression)
+int evalex_infix(const char *expression)
 {
     char *rpn = oneshunting_yard(expression);
     if (rpn == NULL)
