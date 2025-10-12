@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "libstream.h"
+#include "../include/libstream.h"
 
 enum step
 {

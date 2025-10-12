@@ -3,7 +3,7 @@
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 
-#include "libstream.h"
+#include "../include/libstream.h"
 
 /*
 ** FIXME: This test does not ensure that all of your code

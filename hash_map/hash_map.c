@@ -6,17 +6,17 @@
 
 struct hash_map *hash_map_init(size_t size)
 {
-	struct hash_map *hash_map = malloc(sizeof(struct hash_map));
-	if (!hash_map)
+	struct hash_map *new = malloc(sizeof(struct hash_map));
+	if (!new)
 		return NULL;
 	hash_map->data = calloc(size, sizeof(struct pair_list *));
-	if (!hash_map->data)
+	if (!new->data)
 	{
-		free(hash_map);
+		free(new);
 		return NULL;
 	}
-	hash_map->size = size;
-	return hash_map;
+	new->size = size;
+	return new;
 }
 
 bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,bool *updated)
