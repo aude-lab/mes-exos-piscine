@@ -17,5 +17,6 @@ clean:
 	rm -rf *.o $(TARGET) 
 
 check: $(TARGET)
+	@echo "à faire after"
 
 .PHONY: all clean check
