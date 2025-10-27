@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct line_type parse_line(const char *line)
+enum line_type parse_line(const char *line)
 {
     while (isspace(*line) && *line != '\t')
     {
