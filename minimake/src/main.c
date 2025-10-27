@@ -92,10 +92,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-#ifdef DEBUG
-    test_parser();
-#endif
-
     printf("pas encore géré");
     free_minimake_context(&c);
     return 0;
