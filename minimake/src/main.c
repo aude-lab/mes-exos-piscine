@@ -68,11 +68,12 @@ int parse_arguments(int argc, char *argv[], struct minimake_context *c)
                 return 1;
             }
         }
-	else {
-        c->target_count++;
-        c->targets = realloc(c->targets, c->target_count * sizeof(char *));
-        c->targets[c->target_count - 1] = mystrdup(argv[i]);
-    }
+        else
+        {
+            c->target_count++;
+            c->targets = realloc(c->targets, c->target_count * sizeof(char *));
+            c->targets[c->target_count - 1] = mystrdup(argv[i]);
+        }
     }
 
     return 0;
