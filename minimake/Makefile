@@ -8,7 +8,7 @@ TARGET = minimake
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) -o $@ $^
 
 %.o: $(SRC_DIR)/%.c 
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -1,7 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-enum line_type {
+enum line_type
+{
     LINE_RULE,
     LINE_VARIABLE,
     LINE_COMMAND,
@@ -11,6 +12,5 @@ enum line_type {
 };
 
 enum line_type parse_line(const char *line);
-
 
 #endif /* !PARSER_H */

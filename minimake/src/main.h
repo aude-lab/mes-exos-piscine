@@ -14,13 +14,13 @@ struct minimake_context
     int rule_count;
 };
 
-struct variable 
+struct variable
 {
     char *name;
     char *value;
 };
 
-struct rule 
+struct rule
 {
     char *target;
     char **dependencies;
