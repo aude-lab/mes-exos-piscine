@@ -306,64 +306,35 @@ char *substitute_variables(const char *input, struct minimake_context *c)
     return result;
 }
 
-/*char *substitute_variables(const char *input, struct minimake_context *ctx)
+
+char *substitute_variables_recursive(const char *input, struct minimake_context *ctx)
 {
     if (input == NULL) return NULL;
 
-    size_t buffer_size = strlen(input) * 3 + 1;
-    char *result = malloc(buffer_size);
-    if (result == NULL) return NULL;
-    result[0] = '\0';
+    char *current = mystrdup(input);
+    char *next;
+    int changed;
+    int max_iterations = 10;
+    int iteration = 0;
 
-    const char *ptr = input;
+    do {
+        next = substitute_variables(current, ctx);
+        changed = (next && strcmp(current, next) != 0);
 
-    while (*ptr) {
-        if (*ptr == '$') {
-            if (*(ptr + 1) == '$') {
-                strcat(result, "$");
-                ptr += 2;
-                continue;
-            }
-            if (*(ptr + 1) == '(' || *(ptr + 1) == '{') {
-                char closing_char = (*(ptr + 1) == '(') ? ')' : '}';
-                const char *var_end = strchr(ptr + 2, closing_char);
-
-                if (var_end) {
-                    size_t var_len = var_end - (ptr + 2);
-                    char *var_name = malloc(var_len + 1);
-                    strncpy(var_name, ptr + 2, var_len);
-                    var_name[var_len] = '\0';
-
-                    char *value = find_variable_value(ctx, var_name);
-                    if (value) {
-                        strcat(result, value);
-                    }
-
-                    free(var_name);
-                    ptr = var_end + 1;
-                    continue;
-                }
-            }
-
-            if (isalnum(*(ptr + 1))) {
-                char var_name[2] = { *(ptr + 1), '\0' };
-                char *value = find_variable_value(ctx, var_name);
-                if (value) {
-                    strcat(result, value);
-                }
-                ptr += 2;
-                continue;
-            }
+        if (changed) {
+            free(current);
+            current = next;
+        } else {
+            free(next); 
         }
 
-        size_t len = strlen(result);
-        result[len] = *ptr;
-        result[len + 1] = '\0';
-        ptr++;
-    }
+        iteration++;
+    } while (changed && iteration < max_iterations);
 
-    return result;
-}*/
+    return current;
+    
+}
+
 
 static void add_command(struct minimake_context *c, const char *cmd)
 {
@@ -405,7 +376,13 @@ int handle_variable_line(char *line, struct minimake_context *c)
     char *name = trim_whitespace(line);
     char *value = trim_whitespace(equal + 1);
     if (*name != '\0')
+    {
+	char *expanded_name = substitute_variables_recursive(name, c);
+	char *expanded_value = substitute_variables_recursive(value, c);
         add_variable(c, name, value);
+	free(expanded_name);
+        free(expanded_value);
+    }
     return 1;
 }
 
@@ -419,13 +396,20 @@ int handle_rule_line(char *line, struct minimake_context *c, int *in_recipe)
     char *deps = colon + 1;
     if (*target != '\0')
     {
+	char *expanded_target = substitute_variables_recursive(target, c);
         add_rule(c, target);
+	free(expanded_target);
+
         char *dep = strtok(deps, " \t");
         while (dep)
         {
             dep = trim_whitespace(dep);
             if (*dep != '\0')
+            {
+		char *expanded_dep = substitute_variables_recursive(dep, c);
                 add_dependency(c, dep);
+		free(expanded_dep);
+	    }
             dep = strtok(NULL, " \t");
         }
     }
