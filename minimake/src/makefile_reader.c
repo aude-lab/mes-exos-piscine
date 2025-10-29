@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "main.h"
 #include "parser.h"
 
-void add_variable(struct minimake_context *c, const char *name, const char *value)
+void add_variable(struct minimake_context *c, const char *name,
+                  const char *value)
 {
     c->var_count++;
     c->variables =
@@ -109,8 +111,8 @@ int handle_rule_line(char *line, struct minimake_context *c, int *in_recipe)
         char *expanded_target = substitute_variables_recursive(target, c);
         add_rule(c, expanded_target);
         free(expanded_target);
-	
-	char *deps_copy = mystrdup(deps);
+
+        char *deps_copy = mystrdup(deps);
         char *dep = strtok(deps_copy, " \t");
         while (dep)
         {
@@ -123,7 +125,7 @@ int handle_rule_line(char *line, struct minimake_context *c, int *in_recipe)
             }
             dep = strtok(NULL, " \t");
         }
-	free(deps_copy);
+        free(deps_copy);
     }
     *in_recipe = 1;
     return 1;

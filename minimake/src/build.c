@@ -90,7 +90,8 @@ int build_target(struct minimake_context *c, const char *target_name)
             printf("minimake: '%s' is up to date.\n", target_name);
             return 0;
         }
-        fprintf(stderr, "minimake: *** No rule to make target '%s'. Stop.\n", target_name);
+        fprintf(stderr, "minimake: *** No rule to make target '%s'. Stop.\n",
+                target_name);
         return 1;
     }
 

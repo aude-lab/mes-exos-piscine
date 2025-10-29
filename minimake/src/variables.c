@@ -16,7 +16,8 @@ char *find_variable_value(struct minimake_context *c, const char *name)
     return NULL;
 }
 
-int handle_brace_variable(const char *ptr, struct minimake_context *c, char **out_ptr, const char **next_ptr)
+int handle_brace_variable(const char *ptr, struct minimake_context *c,
+                          char **out_ptr, const char **next_ptr)
 {
     char delim_start = *(ptr + 1);
 
@@ -52,12 +53,13 @@ int handle_brace_variable(const char *ptr, struct minimake_context *c, char **ou
         *out_ptr += value_len;
     }
 
-    free(var_name);    
+    free(var_name);
     *next_ptr = var_end + 1;
     return 1;
 }
 
-int handle_single_variable(const char *ptr, struct minimake_context *ctx, char **out_ptr, const char **next_ptr)
+int handle_single_variable(const char *ptr, struct minimake_context *ctx,
+                           char **out_ptr, const char **next_ptr)
 {
     if (!isalnum(*(ptr + 1)))
         return 0;

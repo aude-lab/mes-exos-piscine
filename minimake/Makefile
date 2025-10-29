@@ -3,6 +3,7 @@ CFLAGS = -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
 SRC_DIR = src
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=%.o)
+TEST_DIR = tests
 TARGET = minimake
 
 all: $(TARGET)
@@ -17,6 +18,6 @@ clean:
 	rm -rf *.o $(TARGET) 
 
 check: $(TARGET)
-	@echo "à faire after"
+	./$(TEST_DIR)/test_suite.sh
 
 .PHONY: all clean check
