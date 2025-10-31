@@ -135,13 +135,17 @@ int build_target(struct minimake_context *c, const char *target_name)
         {
             int should_log = should_log_command(rule->commands[i]);
             char *expanded_cmd = substitute_variables(rule->commands[i], c);
-            if (execute_command(expanded_cmd, should_log) != 0)
+
+	    char *fully_expanded = substitute_variables_recursive(expanded_cmd, c);
+            free(expanded_cmd);
+            
+	    if (execute_command(fully_expanded, should_log) != 0)
             {
                 fprintf(stderr, "minimake: *** Stop.\n");
-                free(expanded_cmd);
+                free(fully_expanded);
                 return 1;
             }
-            free(expanded_cmd);
+            free(fully_expanded);
         }
     }
 

@@ -61,7 +61,7 @@ int handle_brace_variable(const char *ptr, struct minimake_context *c,
 int handle_single_variable(const char *ptr, struct minimake_context *ctx,
                            char **out_ptr, const char **next_ptr)
 {
-    if (!isalnum(*(ptr + 1)))
+    if (!isalnum(*(ptr + 1))  && *(ptr + 1) != '_' )
         return 0;
 
     char var_name[2] = { *(ptr + 1), '\0' };
