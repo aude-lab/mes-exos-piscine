@@ -157,6 +157,23 @@ run_subject_tests() {
 
 
 
+run_uptodate_tests() {
+    tit_wrap "$PUR=== UP-TO-DATE TESTS ==="
+
+    run_test "uptodate" "nothing_todo.mk" "empty_target" "minimake: Nothing to be done for 'empty_target'." "NOTHING TO BE DONE TARGET"
+
+    touch tests/test_makefiles/uptodate/existing_file
+    run_test "uptodate" "file_exists.mk" "existing_file" "minimake: Nothing to be done for 'existing_file'." "EXISTING FILE TARGET"
+    rm -f tests/test_makefiles/uptodate/existing_file
+
+
+    touch tests/test_makefiles/uptodate/target tests/test_makefiles/uptodate/dependency
+    sleep 1 
+    touch tests/test_makefiles/uptodate/target
+    run_test "uptodate" "basic_uptodate.mk" "target" "minimake: 'target' is up to date." "TARGET UP TO DATE"
+}
+
+
 
 #--------- MAIN CALL -----------------------
 
@@ -173,6 +190,7 @@ main()
     run_basic_tests
     run_variable_tests
     run_subject_tests
+    run_uptodate_tests
 
     tit_wrap "$BGRN=== RESULTS ==="
     echo "$GRN$PASSED_TESTS$WHI/$TOTAL_TESTS tests passed"

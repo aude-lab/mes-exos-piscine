@@ -61,7 +61,7 @@ int handle_brace_variable(const char *ptr, struct minimake_context *c,
 int handle_single_variable(const char *ptr, struct minimake_context *ctx,
                            char **out_ptr, const char **next_ptr)
 {
-    if (!isalnum(*(ptr + 1))  && *(ptr + 1) != '_' )
+    if (!isalnum(*(ptr + 1)) && *(ptr + 1) != '_')
         return 0;
 
     char var_name[2] = { *(ptr + 1), '\0' };
@@ -100,24 +100,22 @@ char *substitute_variables(const char *input, struct minimake_context *c)
                 continue;
             }
 
-	    int substituted = 0;
+            int substituted = 0;
 
             if (*(ptr + 1) == '(' || *(ptr + 1) == '{')
             {
-		substituted = handle_brace_variable(ptr, c, &out, &ptr);
+                substituted = handle_brace_variable(ptr, c, &out, &ptr);
             }
 
             if (!substituted && isalnum(*(ptr + 1)))
             {
-		 substituted = handle_single_variable(ptr, c, &out, &ptr);
+                substituted = handle_single_variable(ptr, c, &out, &ptr);
             }
 
-	    if (!substituted)
+            if (!substituted)
             {
                 *out++ = *ptr++;
             }
-
-
         }
 
         *out++ = *ptr++;

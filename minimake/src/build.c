@@ -58,13 +58,13 @@ int is_target_up_to_date(struct rule *rule, struct minimake_context *c)
         if (file_exists(rule->dependencies[i]))
         {
             time_t dep_time = get_file_mtime(rule->dependencies[i]);
+
             if (dep_time > target_time)
             {
                 return 0;
             }
         }
     }
-
     return 1;
 }
 
@@ -136,10 +136,11 @@ int build_target(struct minimake_context *c, const char *target_name)
             int should_log = should_log_command(rule->commands[i]);
             char *expanded_cmd = substitute_variables(rule->commands[i], c);
 
-	    char *fully_expanded = substitute_variables_recursive(expanded_cmd, c);
+            char *fully_expanded =
+                substitute_variables_recursive(expanded_cmd, c);
             free(expanded_cmd);
-            
-	    if (execute_command(fully_expanded, should_log) != 0)
+
+            if (execute_command(fully_expanded, should_log) != 0)
             {
                 fprintf(stderr, "minimake: *** Stop.\n");
                 free(fully_expanded);

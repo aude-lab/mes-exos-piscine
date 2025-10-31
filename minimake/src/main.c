@@ -3,14 +3,14 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 
 #include "parser.h"
 
@@ -137,7 +137,6 @@ int execute_command(char *command, int should_log)
             return 1;
         }
     }
-
 }
 
 int should_log_command(const char *command)
