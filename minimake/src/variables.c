@@ -100,18 +100,24 @@ char *substitute_variables(const char *input, struct minimake_context *c)
                 continue;
             }
 
+	    int substituted = 0;
+
             if (*(ptr + 1) == '(' || *(ptr + 1) == '{')
             {
-                if (handle_brace_variable(ptr, c, &out, &ptr))
-                {
-                    continue;
-                }
+		substituted = handle_brace_variable(ptr, c, &out, &ptr);
             }
 
-            if (handle_single_variable(ptr, c, &out, &ptr))
+            if (!substituted && isalnum(*(ptr + 1)))
             {
-                continue;
+		 substituted = handle_single_variable(ptr, c, &out, &ptr);
             }
+
+	    if (!substituted)
+            {
+                *out++ = *ptr++;
+            }
+
+
         }
 
         *out++ = *ptr++;

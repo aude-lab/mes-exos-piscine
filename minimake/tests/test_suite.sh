@@ -131,6 +131,33 @@ Options:
 
 
 
+
+
+
+
+
+
+run_variable_tests() {
+    tit_wrap "$PUR=== VARIABLE TESTS ==="
+    
+    run_test "variables" "simple_var.mk" "all" "echo value\nvalue" "SIMPLE VARIABLE"
+    run_test "variables" "recursive_var.mk" "all" "echo final value\nfinal value" "RECURSIVE VARIABLES"
+}
+
+
+
+
+run_subject_tests() {
+    tit_wrap "$PUR=== SUBJECT EXAMPLE TESTS ==="
+    
+    run_test "test_sujet" "var_subject.mk" "all" "echo foo     bar\nfoo bar" "VARIABLE SUBJECT EXAMPLE"
+    run_test "test_sujet" "silent.mk" "all" "a line" "SILENT COMMAND SUBJECT EXAMPLE"
+    run_test "test_sujet" "recursive_subject.mk" "all" "The answer is 42 and not 2" "RECURSIVE VARIABLE EXAMPLE"
+}
+
+
+
+
 #--------- MAIN CALL -----------------------
 
 main() 
@@ -144,6 +171,8 @@ main()
     fi
 
     run_basic_tests
+    run_variable_tests
+    run_subject_tests
 
     tit_wrap "$BGRN=== RESULTS ==="
     echo "$GRN$PASSED_TESTS$WHI/$TOTAL_TESTS tests passed"

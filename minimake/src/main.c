@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 #include "parser.h"
 
@@ -88,9 +90,9 @@ struct rule *find_default_target(struct minimake_context *ctx)
     return NULL;
 }
 
-int execute_command(const char *command, int should_log)
+int execute_command(char *command, int should_log)
 {
-    const char *cmd_to_execute = command;
+    char *cmd_to_execute = command;
 
     if (*command == '@')
     {
@@ -106,13 +108,36 @@ int execute_command(const char *command, int should_log)
         fflush(stdout);
     }
 
-    int status = system(cmd_to_execute);
-    if (status != 0)
+    pid_t pid = fork();
+    if (pid == -1)
     {
+        perror("fork");
         return 1;
     }
+    else if (pid == 0)
+    {
+        char *argv[] = { "/bin/sh", "-c", cmd_to_execute, NULL };
+        char *envp[] = { NULL };
 
-    return 0;
+        execve("/bin/sh", argv, envp);
+        perror("execve");
+        exit(127);
+    }
+    else
+    {
+        int status;
+        waitpid(pid, &status, 0);
+
+        if (WIFEXITED(status))
+        {
+            return WEXITSTATUS(status);
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
 }
 
 int should_log_command(const char *command)

@@ -43,7 +43,7 @@ struct rule *find_default_target(struct minimake_context *ctx);
 void pretty_print(struct minimake_context *c);
 
 int should_log_command(const char *command);
-int execute_command(const char *command, int should_log);
+int execute_command(char *command, int should_log);
 
 int file_exists(const char *filename);
 time_t get_file_mtime(const char *filename);
