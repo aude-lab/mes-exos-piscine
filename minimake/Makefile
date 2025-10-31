@@ -17,7 +17,7 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -rf *.o $(TARGET) 
 
-check: $(TARGET)
+check:
 	./$(TEST_DIR)/test_suite.sh
 
 .PHONY: all clean check

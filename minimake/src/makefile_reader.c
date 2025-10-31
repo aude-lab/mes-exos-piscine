@@ -38,7 +38,7 @@ void add_rule(struct minimake_context *c, const char *target)
     c->rules[c->rule_count - 1] = rule;
 }
 
-static void add_dependency(struct minimake_context *c, const char *dep)
+void add_dependency(struct minimake_context *c, const char *dep)
 {
     if (c->rule_count == 0)
         return;
@@ -50,7 +50,7 @@ static void add_dependency(struct minimake_context *c, const char *dep)
     rule->dependencies[rule->dep_count - 1] = mystrdup(dep);
 }
 
-static void add_command(struct minimake_context *c, const char *cmd)
+void add_command(struct minimake_context *c, const char *cmd)
 {
     if (c->rule_count == 0)
         return;
@@ -58,11 +58,8 @@ static void add_command(struct minimake_context *c, const char *cmd)
     struct rule *rule = c->rules[c->rule_count - 1];
     rule->cmd_count++;
     rule->commands = realloc(rule->commands, rule->cmd_count * sizeof(char *));
-    rule->commands[rule->cmd_count - 1] = mystrdup(cmd);
 
-    char *expanded_cmd = substitute_variables(cmd, c);
-    rule->commands[rule->cmd_count - 1] = mystrdup(expanded_cmd);
-    free(expanded_cmd);
+    rule->commands[rule->cmd_count - 1] = mystrdup(cmd);
 }
 
 static char *trim_whitespace(char *str)
@@ -81,14 +78,32 @@ static char *trim_whitespace(char *str)
     return str;
 }
 
+char *trim_variable_value(char *str)
+{
+    if (str == NULL)
+        return NULL;
+    char *start = str;
+    while (*start && isspace(*start))
+        start++;
+
+    return start;
+}
+
 int handle_variable_line(char *line, struct minimake_context *c)
 {
     char *equal = strchr(line, '=');
     if (equal == NULL)
         return 0;
+    char *comment_start = strchr(equal + 1, '#');
+    if (comment_start != NULL)
+    {
+        *comment_start = '\0';
+    }
+
     *equal = '\0';
     char *name = trim_whitespace(line);
-    char *value = trim_whitespace(equal + 1);
+    char *value = trim_variable_value(equal + 1);
+
     if (*name != '\0')
     {
         char *expanded_name = substitute_variables_recursive(name, c);
@@ -103,9 +118,17 @@ int handle_rule_line(char *line, struct minimake_context *c, int *in_recipe)
     char *colon = strchr(line, ':');
     if (colon == NULL)
         return 0;
+
     *colon = '\0';
     char *target = trim_whitespace(line);
     char *deps = colon + 1;
+
+    char *comment = strchr(deps, '#');
+    if (comment != NULL)
+    {
+        *comment = '\0';
+    }
+
     if (*target != '\0')
     {
         char *expanded_target = substitute_variables_recursive(target, c);
@@ -164,6 +187,19 @@ int read_makefile(const char *filename, struct minimake_context *c)
 
         enum line_type type = parse_line(line);
 
+        if (in_recipe)
+        {
+            if (type == LINE_EMPTY || type == LINE_COMMAND)
+            {
+                handle_command_line(line, c, in_recipe);
+                continue;
+            }
+            else if (type == LINE_RULE || type == LINE_VARIABLE)
+            {
+                in_recipe = 0;
+            }
+        }
+
         switch (type)
         {
         case LINE_VARIABLE:
@@ -177,11 +213,22 @@ int read_makefile(const char *filename, struct minimake_context *c)
             handle_command_line(line, c, in_recipe);
             break;
         case LINE_EMPTY:
+            if (in_recipe)
+            {
+                handle_command_line(line, c, in_recipe);
+            }
+            break;
         case LINE_COMMENT:
-            in_recipe = 0;
+            if (in_recipe)
+            {
+                handle_command_line(line, c, in_recipe);
+            }
+            else
+            {
+            }
             break;
         case LINE_ERROR:
-            fprintf(stderr, "minimake: *** syntax error\n");
+            fprintf(stderr, "minimake: *** syntax error: %s\n", line);
             free(line);
             fclose(file);
             return 2;

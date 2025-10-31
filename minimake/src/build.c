@@ -134,11 +134,14 @@ int build_target(struct minimake_context *c, const char *target_name)
         for (int i = 0; i < rule->cmd_count; i++)
         {
             int should_log = should_log_command(rule->commands[i]);
-            if (execute_command(rule->commands[i], should_log) != 0)
+            char *expanded_cmd = substitute_variables(rule->commands[i], c);
+            if (execute_command(expanded_cmd, should_log) != 0)
             {
                 fprintf(stderr, "minimake: *** Stop.\n");
+                free(expanded_cmd);
                 return 1;
             }
+            free(expanded_cmd);
         }
     }
 

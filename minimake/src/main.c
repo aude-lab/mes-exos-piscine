@@ -130,21 +130,45 @@ void pretty_print(struct minimake_context *c)
     {
         printf("# variables\n");
         for (int i = 0; i < c->var_count; i++)
+        {
             printf("'%s' = '%s'\n", c->variables[i]->name,
                    c->variables[i]->value);
+        }
     }
+
     if (c->rule_count > 0)
     {
         printf("# rules\n");
         for (int i = 0; i < c->rule_count; i++)
         {
-            printf("(%s):", c->rules[i]->target);
-            for (int i = 0; i < c->rules[i]->dep_count; i++)
-                printf(" [%s]", c->rules[i]->dependencies[i]);
+            struct rule *rule = c->rules[i];
+            printf("(%s):", rule->target);
+
+            for (int j = 0; j < rule->dep_count; j++)
+                printf(" [%s]", rule->dependencies[j]);
             printf("\n");
 
-            for (int k = 0; k < c->rules[i]->cmd_count; k++)
-                printf("    '%s'\n", c->rules[i]->commands[k]);
+            for (int k = 0; k < rule->cmd_count; k++)
+            {
+                char *cmd = rule->commands[k];
+                char normalized_cmd[1024];
+
+                if (cmd[0] == '@')
+                {
+                    const char *content = cmd + 1;
+                    while (*content && isspace(*content) && *content != '\t')
+                        content++;
+                    if (content > cmd + 1)
+                    {
+                        snprintf(normalized_cmd, sizeof(normalized_cmd), "@ %s",
+                                 content);
+                        printf("    '%s'\n", normalized_cmd);
+                        continue;
+                    }
+                }
+
+                printf("    '%s'\n", cmd);
+            }
         }
     }
 }

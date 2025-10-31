@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ###########################################
 #        MY MINIMAKE TESTSUITE            #
@@ -33,17 +33,17 @@ PASSED_TESTS=0
 
 tit_wrap()
 {
-	echo -e "$@$WHI"
+	echo  $@$WHI
 }
 
 print_result()
 {
 	if [ $1 -eq 0 ]; then
-		tit_wrap " $GRN PASS"
+		tit_wrap "$GRN PASS"
 		PASSED_TESTS=$((PASSED_TESTS + 1))
 
 	else
-		tit_wrap " $RED FAIL"
+		tit_wrap "$RED FAIL"
 	fi
 
 	TOTAL_TESTS=$((TOTAL_TESTS + 1))
@@ -59,9 +59,10 @@ run_test() {
     local expected_output="$4"
     local description="$5"
 
-    tit_wrap "$BLUTesting: $description"
+    tit_wrap " $BLU Testing: $description"
     tit_wrap "  File: $GRE$test_file"
     tit_wrap "  Args: $GRE$args"
+    echo
 
     ./minimake $args -f "tests/$TEST_DIR/$category/$test_file" > /tmp/actual_output 2>&1
 
@@ -69,9 +70,13 @@ run_test() {
         print_result 0
 
      else
-        tit_wrap "  Expected:$GRN"
+        tit_wrap $GRN EXPECTED:
+	echo
         echo "$expected_output"
-        tit_wrap "$WHI  Got:$RED"
+	echo
+	echo
+        tit_wrap $RED GOT:
+	echo
         cat /tmp/actual_output
         tit_wrap "$WHI"
         print_result 1
@@ -89,21 +94,37 @@ run_test() {
 run_basic_tests()
 {
 	tit_wrap "$PUR=== BASIC TESTS ==="
-	run_test "basic" "simple.mk" "all" "Hello World" "Simple rule execution"
-    	 run_test "basic" "help.mk" "-h" "Use: minimake [options] [targets]
+	run_test "basic" "simple.mk" "all" "Hello World" "SIMPLE RULE EXECUTION"
+    	run_test "basic" "help.mk" "-h" "Use: minimake [options] [targets]
 Options:
--f file    Using file as makefile
--h         Showing this help message
--p         Pretty-printing the makefile" "Help option"
+  -f file    Using file as makefile
+  -h         Showing this help message
+  -p         Pretty-printing the makefile" "HELP OPTION"
 
-	run_test "basic" "pretty_print.mk" "-p" "# variables
-'VAR1' = 'value1'
-'VAR2' = 'value2'
+	run_test "basic" "Makefile.syntax-test" "-p" "# variables
+'SIMPLE_VAR' = 'coucou'
+'SIMPLE_VAR_COMMENT' = 'the comment is gone '
+'SPACES_BEFORE_TAB' = 'var_beginning    var_end'
+'B' = 'B_var_beginning  B_var_end'
 # rules
-(rule1): [dep1]
-    '@echo \"Building rule1\"'
-(dep1):
-    '@echo \"Dependency 1\"'" "Pretty print option"
+(sparse_rule): [depa] [depb]
+    'command 1'
+    'command 2'
+(packed_rule): [depa] [depb]
+    'command 1'
+    'command 2'
+(silent_rule): [depa] [depb]
+    '@ command 1'
+    '@command 2'
+(rule_comment): [depa] [depb]
+(command_space_rule): [depa] [depb]
+    'echo spaces before'
+    'echo spaces after        '
+    'echo this is a # comment'
+(simple_rule): [simple_dep]
+(no_dep_rule):
+(variable_rule): [beginning] [coucou] [end]
+    'echo \"shouldn't be expanded: \$(SIMPLE_VAR)\"'" "PRETTY PRINT SYNTAX TEST"
 }
 
 
@@ -125,7 +146,7 @@ main()
     run_basic_tests
 
     tit_wrap "$BGRN=== RESULTS ==="
-    echo -e "$GRN$PASSED_TESTS$WHI/$TOTAL_TESTS tests passed"
+    echo "$GRN$PASSED_TESTS$WHI/$TOTAL_TESTS tests passed"
 
     if [ $PASSED_TESTS -eq $TOTAL_TESTS ]; then
         tit_wrap "$BGRN All tests passed!"

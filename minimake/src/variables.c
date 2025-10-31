@@ -129,7 +129,7 @@ char *substitute_variables_recursive(const char *input,
 
     char *current = mystrdup(input);
     char *next;
-    int changed;
+    int changed = 1;
     int max_iterations = 10;
     int iteration = 0;
 
