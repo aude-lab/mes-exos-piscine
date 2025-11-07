@@ -9,7 +9,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-LIBRARY="$PROJECT_ROOT/malloc/libmalloc.so"
+LIBRARY="$PROJECT_ROOT/libmalloc.so"
 TESTS_PASSED=0
 TESTS_FAILED=0
 

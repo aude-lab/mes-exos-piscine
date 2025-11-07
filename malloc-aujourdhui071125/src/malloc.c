@@ -11,6 +11,31 @@ struct blk *head = NULL;
 
 #define MIN_ALLOC_SIZE (128 * 1024)
 
+static void *block_to_ptr(struct blk *block)
+{
+    return block + 1;
+}
+
+static struct blk *ptr_to_block(void *ptr)
+{
+    struct blk *block = ptr;
+    return block - 1;
+}
+
+static struct blk *get_next_block_addr(struct blk *block, size_t size)
+{
+    char *base = (void *)block;
+    return (void *)(base + sizeof(struct blk) + size);
+}
+
+static int blocks_are_adjacent(struct blk *b1, struct blk *b2)
+{
+    char *end_b1 = (void *)(b1 + 1);
+    end_b1 += b1->size;
+    char *start_b2 = (void *)b2;
+    return end_b1 == start_b2;
+}
+
 static void *block_allocator(size_t size)
 {
     size_t page_size = sysconf(_SC_PAGESIZE);
@@ -21,7 +46,7 @@ static void *block_allocator(size_t size)
     size_t alloc_size = needed < MIN_ALLOC_SIZE ? MIN_ALLOC_SIZE : needed;
 
     size_t size_total = ((alloc_size + page_size - 1) / page_size) * page_size;
-    
+
     struct blk *block = mmap(NULL, size_total, PROT_READ | PROT_WRITE,
                              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (block == MAP_FAILED)
@@ -30,7 +55,7 @@ static void *block_allocator(size_t size)
     block->freedom = 1;
     block->next = NULL;
     block->prev = NULL;
-    block->page_start = block;  
+    block->page_start = block;
     block->page_size = size_total;
     return block;
 }
@@ -48,9 +73,8 @@ static void divise_block(struct blk *block, size_t size)
 {
     if (block->size <= size + sizeof(struct blk))
         return;
-    
-    struct blk *newblock =
-        (struct blk *)((char *)block + sizeof(struct blk) + size);
+
+    struct blk *newblock = get_next_block_addr(block, size);
     newblock->size = block->size - size - sizeof(struct blk);
     newblock->freedom = 1;
     newblock->next = block->next;
@@ -79,7 +103,7 @@ __attribute__((visibility("default"))) void *malloc(size_t size)
             current->freedom = 0;
             divise_block(current, a_size);
 
-            return (void *)(current + 1);
+            return block_to_ptr(current);
         }
         current = current->next;
     }
@@ -104,14 +128,9 @@ __attribute__((visibility("default"))) void *malloc(size_t size)
         last->next = newblock;
         newblock->prev = last;
     }
-    return (void *)(newblock + 1);
+    return block_to_ptr(newblock);
 }
 
-static int are_contiguous(struct blk *b1, struct blk *b2)
-{
-    char *end_of_b1 = (char *)(b1 + 1) + b1->size;
-    return (end_of_b1 == (char *)b2);
-}
 
 static void merge_free_block(void)
 {
@@ -119,9 +138,9 @@ static void merge_free_block(void)
 
     while (current != NULL && current->next != NULL)
     {
-        if (current->freedom == 1 
-            && current->next->freedom == 1 && current->page_start == current->next->page_start
-            && are_contiguous(current, current->next))
+        if (current->freedom == 1 && current->next->freedom == 1
+            && current->page_start == current->next->page_start
+            && blocks_are_adjacent(current, current->next))
         {
             current->size += sizeof(struct blk) + current->next->size;
             current->next = current->next->next;
@@ -130,13 +149,11 @@ static void merge_free_block(void)
             {
                 current->next->prev = current;
             }
-	    continue;
+            continue;
         }
         current = current->next;
     }
 }
-
-
 
 static void release_empty_pages(void)
 {
@@ -149,9 +166,10 @@ static void release_empty_pages(void)
         if (current->page_start == current && current->freedom == 1)
         {
             int can_free = 1;
-            if (current->next != NULL && current->next->page_start == current->page_start)
+            if (current->next != NULL
+                && current->next->page_start == current->page_start)
             {
-                can_free = 0; 
+                can_free = 0;
             }
 
             if (can_free)
@@ -172,14 +190,12 @@ static void release_empty_pages(void)
     }
 }
 
-
-
 __attribute__((visibility("default"))) void free(void *ptr)
 {
     if (ptr == NULL)
         return;
 
-    struct blk *block = (struct blk *)ptr - 1;
+    struct blk *block = ptr_to_block(ptr);
 
     if (block == NULL)
         return;
@@ -216,7 +232,7 @@ __attribute__((visibility("default"))) void *realloc(void *ptr, size_t size)
         return NULL;
     }
 
-    struct blk *info_block = (struct blk *)ptr - 1;
+    struct blk *info_block = ptr_to_block(ptr);
 
     if (info_block->size >= size)
         return ptr;
