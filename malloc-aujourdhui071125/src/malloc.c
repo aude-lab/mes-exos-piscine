@@ -113,6 +113,8 @@ __attribute__((visibility("default"))) void *malloc(size_t size)
     if (newblock == NULL)
         return NULL;
 
+    divise_block(newblock, a_size);
+
     newblock->freedom = 0;
 
     if (head == NULL)
