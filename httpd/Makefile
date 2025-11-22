@@ -14,7 +14,7 @@ $(TARGET):
 clean:
 	@echo "Cleaning project..."
 	$(MAKE) -C $(SRC_DIR) clean
-	rm -rf $(BUILD_DIR)
+	rm -rf $(SRC_DIR)/$(BUILD_DIR)
 	rm -f $(TARGET)
 
 check:
