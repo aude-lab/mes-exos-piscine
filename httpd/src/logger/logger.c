@@ -7,7 +7,6 @@
 #include <time.h>
 #include <unistd.h>
 
-
 static FILE *log_file = NULL;
 static int logging_enabled = 0;
 
@@ -81,19 +80,27 @@ int logger_init(struct config *config)
     return 0;
 }
 
-void log_request(const char *server_name, const char *request_type,
+void log_request(struct string *server_name, const char *request_type,
                  const char *target, const char *client_ip)
 {
-    write_log("[%s] received %s on '%s' from %s", server_name, request_type,
-              target, client_ip);
+    write_log("[%.*s] received %s on '%s' from %s", server_name->size,
+              server_name->data, request_type, target, client_ip);
 }
 
-void log_response(const char *server_name, int status_code,
-                  const char *client_ip, const char *request_type,
-                  const char *target)
+void log_response(struct string *server_name, int status_code,
+                  const char *client_ip, struct http_request *request)
 {
-    write_log("[%s] responding with %d to %s for %s on '%s'", server_name,
-              status_code, client_ip, request_type, target);
+    if (request && request->method && request->target)
+    {
+        write_log("[%.*s] responding with %d to %s for %s on '%s'",
+                  server_name->size, server_name->data, status_code, client_ip,
+                  request->method, request->target);
+    }
+    else
+    {
+        write_log("[%.*s] responding with %d to %s", server_name->size,
+                  server_name->data, status_code, client_ip);
+    }
 }
 
 void log_bad_request(const char *server_name, const char *client_ip)

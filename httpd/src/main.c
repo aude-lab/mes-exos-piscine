@@ -3,29 +3,20 @@
 #include <string.h>
 
 #include "config/config.h"
+#include "daemon/daemon.h"
 #include "logger/logger.h"
 #include "server/server.h"
 #include "utils/string/string.h"
 
-int main(int argc, char *argv[])
+static int run_server(struct config *config)
 {
-    struct config *config = parse_configuration(argc, argv);
-
-    if (!config)
-    {
-        fprintf(stderr, "Error: Invalid configuration\n");
-        return 2;
-    }
-
     if (logger_init(config) != 0)
     {
         fprintf(stderr, "Failed to initialize logger\n");
-        config_destroy(config);
         return 1;
     }
 
     printf("Configuration loaded successfully!\n");
-
     printf("   Port: %s\n", config->servers->port);
     printf("   IP: %s\n", config->servers->ip);
     printf("   Logging: %s\n", config->log ? "enabled" : "disabled");
@@ -38,11 +29,42 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "Failed to start server\n");
         logger_cleanup();
-        config_destroy(config);
         return 1;
     }
 
     logger_cleanup();
-    config_destroy(config);
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    struct config *config = parse_configuration(argc, argv);
+
+    if (!config)
+    {
+        fprintf(stderr, "Error: Invalid configuration\n");
+        return 2;
+    }
+
+    if (config->daemon == STOP)
+    {
+        int result = stop_daemon(config);
+        config_destroy(config);
+        return result;
+    }
+
+    setup_signal_handlers();
+
+    if (config->daemon == START)
+    {
+        if (daemonize(config) != 0)
+        {
+            config_destroy(config);
+            return 1;
+        }
+    }
+
+    int result = run_server(config);
+    config_destroy(config);
+    return result;
 }
