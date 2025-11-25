@@ -1,5 +1,5 @@
 #include "logger.h"
-
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,32 +44,53 @@ static void write_log(const char *format, ...)
 
 int logger_init(struct config *config)
 {
+
     if (config == NULL)
         return -1;
 
     logging_enabled = config->log;
 
     if (!logging_enabled)
+    {
         return 0;
+    }
 
     if (config->log_file != NULL)
     {
+	    
         log_file = fopen(config->log_file, "a");
         if (log_file == NULL)
-        {
-            log_file = stderr;
-            fprintf(stderr,
-                    "Warning: Could not open log file '%s', using stderr\n",
-                    config->log_file);
+        
+	{
+	    if (config->daemon == NO_OPTION)
+            {
+                log_file = stderr; 
+                fprintf(stderr, "Warning: Could not open log file '%s'\n", 
+                        config->log_file);
+            }
+	    else
+            {
+                log_file = fopen("HTTPd.log", "a");
+                if (log_file == NULL)
+                {
+                    logging_enabled = 0;
+                    return 0;
+                }
+            }
         }
     }
     else
     {
         if (config->daemon != NO_OPTION)
         {
+
             log_file = fopen("HTTPd.log", "a");
             if (log_file == NULL)
-                log_file = stderr;
+            {
+
+                logging_enabled = 0;
+                return 0;
+            }
         }
         else
         {
@@ -106,7 +127,6 @@ void log_response(struct string *server_name, int status_code,
 void log_bad_request(const char *server_name, const char *client_ip)
 {
     write_log("[%s] received Bad Request from %s", server_name, client_ip);
-    write_log("[%s] responding with 400 to %s", server_name, client_ip);
 }
 
 void log_method_not_allowed(const char *server_name, int status_code,

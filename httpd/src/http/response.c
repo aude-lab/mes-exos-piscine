@@ -98,3 +98,45 @@ struct string *http_create_500_response(void)
     return http_create_response(500, "Internal Server Error", "text/html",
                                 body);
 }
+
+struct string *http_create_403_response(void)
+{
+    const char *body =
+        "<html>\n"
+        "<head><title>403 Forbidden</title></head>\n"
+        "<body>\n"
+        "<h1>403 Forbidden</h1>\n"
+        "<p>You don't have permission to access this resource.</p>\n"
+        "</body>\n"
+        "</html>\n";
+
+    return http_create_response(403, "Forbidden", "text/html", body);
+}
+
+struct string *http_create_405_response(void)
+{
+    const char *body = "<html>\n"
+                       "<head><title>405 Method Not Allowed</title></head>\n"
+                       "<body>\n"
+                       "<h1>405 Method Not Allowed</h1>\n"
+                       "<p>The method is not allowed for this resource.</p>\n"
+                       "</body>\n"
+                       "</html>\n";
+
+    return http_create_response(405, "Method Not Allowed", "text/html", body);
+}
+
+struct string *http_create_505_response(void)
+{
+    const char *body =
+        "<html>\n"
+        "<head><title>505 HTTP Version Not Supported</title></head>\n"
+        "<body>\n"
+        "<h1>505 HTTP Version Not Supported</h1>\n"
+        "<p>The HTTP version is not supported by this server.</p>\n"
+        "</body>\n"
+        "</html>\n";
+
+    return http_create_response(505, "HTTP Version Not Supported", "text/html",
+                                body);
+}

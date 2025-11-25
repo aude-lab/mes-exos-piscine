@@ -26,6 +26,7 @@ int is_shutdown_requested(void)
     return g_shutdown;
 }
 
+
 void setup_signal_handlers(void)
 {
     struct sigaction sa;
@@ -111,13 +112,6 @@ int stop_daemon(struct config *config)
         return 1;
     }
 
-    sleep(2);
-    if (kill(pid, 0) == 0)
-    {
-        fprintf(stderr, "Warning: Process still running\n");
-        kill(pid, SIGKILL);
-        sleep(1);
-    }
     remove(config->pid_file);
     printf("Server stopped successfully\n");
 
@@ -144,14 +138,6 @@ int daemonize(struct config *config)
         printf("Server started with PID: %d\n", pid);
         _exit(0);
     }
-
-    if (setsid() < 0)
-    {
-        perror("setsid");
-        return -1;
-    }
-
-    chdir("/");
 
     int devnull = open("/dev/null", O_RDWR);
     if (devnull != -1)
