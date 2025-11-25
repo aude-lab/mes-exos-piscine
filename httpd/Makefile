@@ -18,8 +18,13 @@ clean:
 	rm -f $(TARGET)
 
 check:
-	@echo "Running tests..."
-	$(MAKE) -C $(TESTS_DIR) check
+	python3 -m venv tests/env
+	tests/env/bin/pip install -r tests/requirements.txt
+	tests/env/bin/pytest tests/ -v
+	rm -rf tests/env
+	#@echo "Running tests..."
+	#$(MAKE) -C $(TESTS_DIR) check
+	
 
 test-deps:
 	$(MAKE) -C $(TESTS_DIR) deps

@@ -9,7 +9,7 @@ BIN_DIR = $(BUILD_DIR)/BIN
 MODULE_OBJS = $(addprefix $(OBJ_DIR)/, \
 	config/config.o \
 	utils/string/string.o \
-	http/http.o http/request.o http/response.o \
+	http/http.o http/response.o \
 	daemon/daemon.o \
 	server/server.o \
 	logger/logger.o \

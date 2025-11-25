@@ -9,3 +9,5 @@ test_game
 
 # trashfiles
 *.o
+*.txt
+__pycache__

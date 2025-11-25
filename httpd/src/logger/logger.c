@@ -1,4 +1,5 @@
 #include "logger.h"
+
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -44,7 +45,6 @@ static void write_log(const char *format, ...)
 
 int logger_init(struct config *config)
 {
-
     if (config == NULL)
         return -1;
 
@@ -57,18 +57,17 @@ int logger_init(struct config *config)
 
     if (config->log_file != NULL)
     {
-	    
         log_file = fopen(config->log_file, "a");
         if (log_file == NULL)
-        
-	{
-	    if (config->daemon == NO_OPTION)
+
+        {
+            if (config->daemon == NO_OPTION)
             {
-                log_file = stderr; 
-                fprintf(stderr, "Warning: Could not open log file '%s'\n", 
+                log_file = stderr;
+                fprintf(stderr, "Warning: Could not open log file '%s'\n",
                         config->log_file);
             }
-	    else
+            else
             {
                 log_file = fopen("HTTPd.log", "a");
                 if (log_file == NULL)
@@ -83,11 +82,9 @@ int logger_init(struct config *config)
     {
         if (config->daemon != NO_OPTION)
         {
-
             log_file = fopen("HTTPd.log", "a");
             if (log_file == NULL)
             {
-
                 logging_enabled = 0;
                 return 0;
             }

@@ -176,7 +176,7 @@ static void send_error_response(const struct request_context *ctx,
     case 405:
         response = http_create_405_response();
         break;
-    case 403:  
+    case 403:
         response = http_create_403_response();
         break;
     case 404:
@@ -201,99 +201,6 @@ static void send_error_response(const struct request_context *ctx,
     log_response(ctx->config->servers->server_name, status_code, ctx->client_ip,
                  ctx->request);
 }
-
-/*static void communicate(int client_fd, struct config *config)
-{
-    ssize_t bytes = 0;
-    char buffer[BUFFER_SIZE];
-    char *client_ip = get_client_ip(client_fd);
-
-    bytes = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
-
-    if (bytes <= 0)
-    {
-        close(client_fd);
-        return;
-    }
-
-    buffer[bytes] = '\0';
-
-    struct string *raw_request = string_create(buffer, bytes);
-
-    if (!raw_request)
-    {
-        log_bad_request(config->servers->server_name->data, client_ip);
-        struct request_context ctx = { client_fd, config, client_ip, NULL };
-        send_error_response(&ctx, 400);
-        close(client_fd);
-        return;
-    }
-
-    struct http_request *request = http_parse_request(raw_request);
-    struct request_context ctx = { client_fd, config, client_ip, request };
-
-    if (request && request->method && request->target)
-    {
-        if (strcmp(request->version, "HTTP/1.1") != 0)
-        {
-            log_response(config->servers->server_name, 505, client_ip, request);
-            send_error_response(&ctx, 505);
-            http_request_free(request);
-            string_destroy(raw_request);
-            close(client_fd);
-            return;
-        }
-
-        log_request(config->servers->server_name, request->method,
-                    request->target, client_ip);
-
-        if (strcmp(request->method, "GET") != 0
-            && strcmp(request->method, "HEAD") != 0)
-        {
-            log_method_not_allowed(config->servers->server_name->data, 405,
-                                   client_ip, request->target);
-            send_error_response(&ctx, 405);
-            http_request_free(request);
-            string_destroy(raw_request);
-            close(client_fd);
-            return;
-        }
-
-        char filepath[1024];
-        snprintf(filepath, sizeof(filepath), "%s%s", config->servers->root_dir,
-                 request->target);
-
-        struct stat path_stat;
-        if (stat(filepath, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
-        {
-            size_t len = strlen(filepath);
-            if (len > 0 && filepath[len - 1] != '/')
-            {
-                strncat(filepath, "/", sizeof(filepath) - len - 1);
-            }
-            strncat(filepath, config->servers->default_file,
-                    sizeof(filepath) - strlen(filepath) - 1);
-        }
-
-        int result = serve_file(&ctx, filepath);
-        if (result == -2)
-            send_error_response(&ctx, 403);
-        else if (result != 0)
-            send_error_response(&ctx, 404);
-    }
-
-    else
-    {
-        log_bad_request(config->servers->server_name->data, client_ip);
-        send_error_response(&ctx, 400);
-    }
-
-    if (request)
-        http_request_free(request);
-    string_destroy(raw_request);
-
-    close(client_fd);
-}*/
 
 static struct string *read_client_request(int client_fd)
 {

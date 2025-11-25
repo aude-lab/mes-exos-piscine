@@ -1,7 +1,7 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -31,7 +31,6 @@ static int run_server(struct config *config)
     logger_cleanup();
     return 0;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -69,7 +68,6 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
-
 
     int result = run_server(config);
     config_destroy(config);

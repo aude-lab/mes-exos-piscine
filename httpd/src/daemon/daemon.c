@@ -26,7 +26,6 @@ int is_shutdown_requested(void)
     return g_shutdown;
 }
 
-
 void setup_signal_handlers(void)
 {
     struct sigaction sa;

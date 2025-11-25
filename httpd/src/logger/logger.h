@@ -6,6 +6,7 @@
 #include "../config/config.h"
 #include "../http/http.h"
 #include "../utils/string/string.h"
+
 int logger_init(struct config *config);
 
 void log_request(struct string *server_name, const char *request_type,
