@@ -86,14 +86,15 @@ int stop_daemon(struct config *config)
     if (!file)
     {
         fprintf(stderr, "Error: pid file '%s' not found\n", config->pid_file);
-        return 1;
+        return 0;
     }
     pid_t pid;
     if (fscanf(file, "%d", &pid) != 1)
     {
         fprintf(stderr, "Error: Invalid pid file format\n");
         fclose(file);
-        return 1;
+        remove(config->pid_file);
+        return 0;
     }
     fclose(file);
 
@@ -101,13 +102,14 @@ int stop_daemon(struct config *config)
     {
         fprintf(stderr, "Error: Process %d is not running\n", pid);
         remove(config->pid_file);
-        return 1;
+        return 0;
     }
 
     printf("Stopping server (PID: %d)...\n", pid);
     if (kill(pid, SIGINT) != 0)
     {
         fprintf(stderr, "Error: Failed to send signal to process %d\n", pid);
+        remove(config->pid_file);
         return 1;
     }
 
