@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -std=c99 -Werror -Wall -Wextra -Wvla -pedantic
 OBJ_DIR ?= ../../build/obj/utils
 SRC_DIR = .
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
+SOURCES = string/string.c
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 .PHONY: all clean
