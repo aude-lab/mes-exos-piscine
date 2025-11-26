@@ -71,6 +71,8 @@ static bool verify_mandatory_option(struct config *my_config)
         return false;
     if (!my_config->pid_file)
         return false;
+    if (my_config->daemon == STOP)
+        return true;
     if (!my_config->servers->server_name
         || my_config->servers->server_name->size == 0)
         return false;

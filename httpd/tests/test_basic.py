@@ -15,8 +15,8 @@ SERVER_NAME = "test_server"
 BASE_URL = f"http://{IP}:{PORT}"
 
 @pytest.fixture(scope="function")
+
 def httpd_server():
-    """Fixture to start and stop the HTTP server for each test"""
     os.makedirs(ROOT_DIR, exist_ok=True)
     
     with open(f"{ROOT_DIR}/index.html", "w") as f:
@@ -50,7 +50,6 @@ def httpd_server():
 
 
 def test_get_request(httpd_server):
-    """Test 1: Basic GET request"""
     response = requests.get(f"{BASE_URL}/index.html", timeout=2)
     
     assert response.status_code == 200
@@ -60,7 +59,6 @@ def test_get_request(httpd_server):
 
 
 def test_head_request(httpd_server):
-    """Test 2: HEAD request should not return body"""
     response = requests.head(f"{BASE_URL}/index.html", timeout=2)
     
     assert response.status_code == 200
@@ -68,9 +66,26 @@ def test_head_request(httpd_server):
     assert "Content-Length" in response.headers
     assert response.headers.get("Connection") == "close"
 
+def test_403_forbidden(httpd_server):
+    protected_file = f"{ROOT_DIR}/protected.html"
+
+    with open(protected_file, "w") as f:
+        f.write("<h1>Protected Content</h1>")
+
+    os.chmod(protected_file, 0o000) 
+
+    try:
+        response = requests.get(f"{BASE_URL}/protected.html", timeout=2)
+
+        assert response.status_code == 403
+        assert "403 Forbidden" in response.text
+        assert "Forbidden" in response.text
+
+    finally:
+        os.chmod(protected_file, 0o644)
+        os.remove(protected_file)
 
 def test_404_not_found(httpd_server):
-    """Test 3: 404 for non-existent file"""
     response = requests.get(f"{BASE_URL}/notfound.html", timeout=2)
     
     assert response.status_code == 404
@@ -78,7 +93,6 @@ def test_404_not_found(httpd_server):
 
 
 def test_405_method_not_allowed(httpd_server):
-    """Test 4: 405 for POST method"""
     response = requests.post(f"{BASE_URL}/index.html", timeout=2)
     
     assert response.status_code == 405
@@ -86,7 +100,6 @@ def test_405_method_not_allowed(httpd_server):
 
 
 def test_default_file(httpd_server):
-    """Test 5: Directory should serve default file"""
     response = requests.get(f"{BASE_URL}/", timeout=2)
     
     assert response.status_code == 200
@@ -94,7 +107,6 @@ def test_default_file(httpd_server):
 
 
 def test_malformed_request(httpd_server):
-    """Test 6: Malformed request should return 400"""
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((IP, int(PORT)))
     
@@ -106,7 +118,6 @@ def test_malformed_request(httpd_server):
 
 
 def test_http_version_not_supported(httpd_server):
-    """Test 7: HTTP/2.0 should return 505"""
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((IP, int(PORT)))
     
@@ -118,7 +129,6 @@ def test_http_version_not_supported(httpd_server):
 
 
 def test_multiple_requests(httpd_server):
-    """Test 8: Multiple sequential requests"""
     for i in range(5):
         response = requests.get(f"{BASE_URL}/index.html", timeout=2)
         assert response.status_code == 200
