@@ -69,22 +69,24 @@ public class BattleManager {
             
             String targetLogin = turn.getTargetLogin();
             float currentHp = hpMap.get(targetLogin);
-            float newHp = Math.max(0, Math.min(100, currentHp - packet.getDamage()));
+
+	    float newHp = currentHp - packet.getDamage();
+	    newHp = Math.max(0.0f, Math.min(100.0f, newHp));
+
+
             hpMap.put(targetLogin, newHp);
+
+	    long playersAlive = hpMap.values().stream()
+    		.filter(hp -> hp > 0.0f) 
+    		.count();
+
+	if (playersAlive == 1) {
+    		String winner = hpMap.entrySet().stream()
+        		.filter(e -> e.getValue() > 0.0f) 
+        		.findFirst()
+        		.get()
+        		.getKey();
             
-            long playersAlive = hpMap.values().stream().filter(hp -> hp > 0).count();
-            if (playersAlive == 1) {
-                String winner = hpMap.entrySet().stream()
-                    .filter(e -> e.getValue() > 0)
-                    .findFirst()
-                    .get()
-                    .getKey();
-                
-                Report report = new Report();
-                report.setType(ReportType.WINNER);
-                report.setPlayer(winner);
-                report.setOutcome(hpMap);
-                return report;
             }
         }
         
