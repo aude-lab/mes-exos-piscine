@@ -57,10 +57,6 @@ public class BattleManager {
     private Report simulateBattle(Battle battle, Map<String, Nuc> nucsMap) {
         Map<String, Float> hpMap = new HashMap<>();
         nucsMap.forEach((login, nuc) -> hpMap.put(login, nuc.getHp()));
-	Report initialCheck = checkForWinner(hpMap);
-        if (initialCheck != null) {
-            return initialCheck;
-        }
         
         for (Turn turn : battle.getTurns()) {
             Packet packet = turn.getPacket();
