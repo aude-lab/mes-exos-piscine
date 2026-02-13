@@ -1,0 +1,94 @@
+package fr.epita.assistants.yakamon.domain.service;
+
+import fr.epita.assistants.yakamon.data.repository.PlayerRepository;
+import fr.epita.assistants.yakamon.domain.entity.PlayerEntity;
+import fr.epita.assistants.yakamon.utils.Direction;
+import fr.epita.assistants.yakamon.utils.Point;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
+import java.time.LocalDateTime;
+
+@ApplicationScoped
+public class PlayerService {
+
+    @Inject
+    PlayerRepository playerRepository;
+
+    public PlayerEntity getPlayer() {
+        return playerRepository.findPlayer();
+    }
+
+    @Transactional
+    public PlayerEntity createPlayer(String name) {
+        PlayerEntity player = new PlayerEntity();
+        player.setName(name);
+        player.setPosX(0);
+        player.setPosY(0);
+        player.setLastMove(null);
+        player.setLastCatch(null);
+        player.setLastCollect(null);
+        player.setLastFeed(null);
+        
+        return playerRepository.savePlayer(player);
+    }
+
+    @Transactional
+    public void updatePosition(Integer newX, Integer newY) {
+        PlayerEntity player = getPlayer();
+        if (player != null) {
+            player.setPosX(newX);
+            player.setPosY(newY);
+            player.setLastMove(LocalDateTime.now());
+            playerRepository.savePlayer(player);
+        }
+    }
+
+    @Transactional
+    public void movePlayer(Direction direction) {
+        PlayerEntity player = getPlayer();
+        if (player != null) {
+            Point movePoint = direction.getPoint();
+            Integer newX = player.getPosX() + movePoint.getPosX();
+            Integer newY = player.getPosY() + movePoint.getPosY();
+            updatePosition(newX, newY);
+        }
+    }
+
+    @Transactional
+    public void updateLastCatch() {
+        PlayerEntity player = getPlayer();
+        if (player != null) {
+            player.setLastCatch(LocalDateTime.now());
+            playerRepository.savePlayer(player);
+        }
+    }
+
+    @Transactional
+    public void updateLastCollect() {
+        PlayerEntity player = getPlayer();
+        if (player != null) {
+            player.setLastCollect(LocalDateTime.now());
+            playerRepository.savePlayer(player);
+        }
+    }
+
+    @Transactional
+    public void updateLastFeed() {
+        PlayerEntity player = getPlayer();
+        if (player != null) {
+            player.setLastFeed(LocalDateTime.now());
+            playerRepository.savePlayer(player);
+        }
+    }
+
+    public boolean playerExists() {
+        return getPlayer() != null;
+    }
+
+    @Transactional
+    public void deleteAll() {
+        playerRepository.deleteAll();
+    }
+}
