@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.21.2)
-project(antagonist LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-find_package(OpenCV REQUIRED)
-
-add_subdirectory("src")
-add_subdirectory("test")
+project(antagonist)
+add_subdirectory(libbeaver)
+add_executable(beaver_run
+    src/main.cc
+)
+target_compile_options(beaver_run PRIVATE -Wall -Wextra -Werror -pedantic -Wold-style-cast)
+target_compile_features(beaver_run PRIVATE cxx_std_20)
+set_target_properties(beaver_run PROPERTIES CXX_EXTENSIONS OFF)
+target_link_libraries(beaver_run PRIVATE beaver)

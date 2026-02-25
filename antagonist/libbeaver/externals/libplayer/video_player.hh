@@ -1,22 +1,29 @@
-#include "video_player.hh"
+#pragma once
 
 #include <iostream>
+#include <opencv2/opencv.hpp>
+#include <string>
 #include <thread>
 
-static char pixelToAscii(int pixelValue)
+inline char pixelToAscii(int pixelValue)
 {
     const std::string ascii_chars = ".:-=+*#%@8WM";
     int index = pixelValue * ascii_chars.length() / 256;
     return ascii_chars[index];
 }
 
-static std::string rgbToAnsi(int r, int g, int b)
+inline std::string rgbToAnsi(int r, int g, int b)
 {
     return "\033[38;2;" + std::to_string(r) + ";" + std::to_string(g) + ";"
         + std::to_string(b) + "m";
 }
 
-void play_video(std::string& video_path)
+/**
+ * @brief Plays a given video file.
+ *
+ * @param video_path The path to the video file to play.
+ */
+inline void play_video(std::string& video_path)
 {
     std::cout << std::endl;
     cv::VideoCapture video(video_path);
