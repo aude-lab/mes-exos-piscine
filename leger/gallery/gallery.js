@@ -12,7 +12,7 @@ function extract(directoryPath) {
     files.forEach((file) => {
         const filePath = path.join(directoryPath, file);
         const content = fs.readFileSync(filePath, "utf8");
-        const emailRegex = /[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}/g;
+        const emailRegex = /[a-z0-9_.+-]+@[a-z0-9.-]+\.[a-z.]{2,}/g;
         const matches = content.match(emailRegex);
 
         if (matches) {
