@@ -14,9 +14,6 @@ function startServer() {
         );
 
         const userID = nextId++;
-
-        console.log(`[${userID}] ${userName}: trying to establish connection`);
-
         if (
             !userName ||
             [...clients.values()].some((client) => client.userName === userName)
@@ -30,7 +27,6 @@ function startServer() {
 
         clients.set(ws, { id: userID, userName });
 
-        /*console.log(`[${userID}] ${userName}: trying to establish connection`);*/
         ws.send(`Welcome ${userName}`);
         const totalPlayers = clients.size;
 
@@ -43,9 +39,7 @@ function startServer() {
         broadcast(`${userName} connected`, ws);
 
         ws.on("message", (message) => {
-            if (!message.includes(": trying to establish connection")) {
                 console.log(`[${userID}] ${message}`);
-            }
         });
 
         ws.on("close", (code, reason) => {

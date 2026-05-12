@@ -3,9 +3,9 @@ const WebSocket = require("ws");
 function addClient(userName) {
     const ws = new WebSocket(`ws://localhost:8080?username=${userName}`);
 
-    /*ws.on("open", () => {
+    ws.on("open", () => {
         ws.send(`${userName}: trying to establish connection`);
-    });*/
+    });
 
     ws.on("message", (message) => {
         console.log(`<server to ${userName}>: ${message}`);
