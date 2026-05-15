@@ -20,6 +20,17 @@ export async function initSocket() {
         },
     });
 
+
+
+
+
+    await new Promise((resolve) => {
+        socket.on("connect", resolve);
+    });
+
+
+
+
     socket.on("connect_error", async (err) => {
         const message = err?.message ?? "";
 
