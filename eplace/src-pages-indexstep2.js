@@ -5,17 +5,18 @@ import { initCanvas, renderCanvasUpdate } from "../rooms/canvas/utils";
 
 calculateLayout();
 
-Ensuite l'auth + le slug de la room :
-
 (async () => {
     const isAuth = await authenticate();
     if (!isAuth) return;
 
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const roomSlug = pathParts[0] ?? "epi-place";
+    let roomSlug;
+    if (pathParts[0]) {
+        roomSlug = pathParts[0];
+    } else {
+        roomSlug = "epi-place";
+    }
 
-
-Ensuite le socket + buffer des updates :
     await initSocket();
 
     const pendingUpdates = [];
@@ -26,34 +27,30 @@ Ensuite le socket + buffer des updates :
     await subscribe(roomSlug);
 
 
-Ensuite le fetch config + mise à jour du DOM :
-    const configResponse = await authedAPIRequest(`/rooms/${roomSlug}/config`, { method: "GET" });
-    if (!configResponse || !configResponse.ok) return;
-    const config = await configResponse.json();
+    const configurationResponse = await authedAPIRequest(`/rooms/${roomSlug}/config`, { method: "GET" });
+    if (!configurationResponse || !configurationResponse.ok) return;
+    const config = await configurationResponse.json();
     const { colors, metadata } = config;
 
-    const roomNameEl = document.getElementById("room-name");
-    const roomDescEl = document.getElementById("room-description");
-    if (roomNameEl) roomNameEl.textContent = metadata?.name ?? roomSlug;
-    if (roomDescEl) {
+    const roomNameElem = document.getElementById("room-name");
+    const roomDescriptElem = document.getElementById("room-description");
+    if (roomNameElem) roomNameElem.textContent = metadata?.name ?? roomSlug;
+    if (roomDescriptElem) {
         if (metadata?.description) {
-            roomDescEl.textContent = metadata.description;
-            roomDescEl.style.display = "";
+            roomDescriptElem.textContent = metadata.description;
+            roomDescriptElem.style.display = "";
         } else {
-            roomDescEl.style.display = "none";
+            roomDescriptElem.style.display = "none";
         }
     }
 
-
-
-Ensuite le fetch canvas + décodage + affichage :
     const canvasResponse = await authedAPIRequest(`/rooms/${roomSlug}/canvas`, { method: "GET" });
     if (!canvasResponse || !canvasResponse.ok) return;
 
     const canvasBuffer = await canvasResponse.arrayBuffer();
     const encoded = new Uint8Array(canvasBuffer);
     const totalPixels = metadata.canvasDimensions * metadata.canvasDimensions;
-    const decoded = decodeCanvas(encoded, totalPixels);
+    const decoded = decodecanva(encoded, totalPixels);
 
     initCanvas(decoded, colors, metadata.canvasDimensions);
 
@@ -69,9 +66,7 @@ Ensuite le fetch canvas + décodage + affichage :
 
 
 
-
-Et enfin la fonction de décodage :
-function decodeCanvas(data, totalPixels) {
+function decodecanva(data, totalPixels) {
     const pixels = [];
     let bitBuffer = 0;
     let bitsInBuffer = 0;
